@@ -1,9 +1,13 @@
 -- ExitDoor-Automation | Server-Hop + Auto-Restart via GitHub-Loader
 -- =============================================================
 local RAW_URL = "https://raw.githubusercontent.com/SFRDevelopment/asdasd/refs/heads/main/letzer.lua"
+
+-- Positionierung vor dem Prompt:
+local PROMPT_DISTANCE = 3.5   -- Studs vor dem Prompt (~1 Meter). Negativ = andere Seite.
+local HEIGHT_OFFSET   = 0.5   -- Höhe relativ zum Prompt-Part (anpassen falls schwebt/versinkt)
 -- =============================================================
 
-print("════════ ExitDoor v3.0 (GitHub-Loader) ════════")
+print("════════ ExitDoor v3.1 (GitHub-Loader) ════════")
 print("Loader-URL: " .. RAW_URL)
 
 local player = game.Players.LocalPlayer
@@ -98,7 +102,6 @@ local function hopToAnotherServer()
 end
 
 local function mainLoop()
-    -- Erst warten bis der Server wirklich geladen ist (wichtig nach Teleport)
     if not game:IsLoaded() then game.Loaded:Wait() end
     print("🔄 Gestartet auf Server: " .. game.JobId)
     repeat wait(1) until player.Character and player.Character:FindFirstChild("HumanoidRootPart")
@@ -112,8 +115,22 @@ local function mainLoop()
 
     local root = player.Character:FindFirstChild("HumanoidRootPart")
     if root then
-        root.CFrame = part.CFrame + Vector3.new(0, 0.5, 0)
-        print("📍 Teleportiert zum Part")
+        local promptPos = part.Position
+
+        -- Front-Richtung des Parts, flach auf die Horizontale gelegt
+        local front = part.CFrame.LookVector
+        front = Vector3.new(front.X, 0, front.Z)
+        if front.Magnitude < 0.001 then front = Vector3.new(0, 0, 1) end
+        front = front.Unit
+
+        -- Position: ein Stück vor dem Prompt, auf Prompt-Höhe
+        local standPos = promptPos + front * PROMPT_DISTANCE + Vector3.new(0, HEIGHT_OFFSET, 0)
+
+        -- Blick genau zum Prompt, aber waagerecht (kein Kippen nach oben/unten)
+        local lookTarget = Vector3.new(promptPos.X, standPos.Y, promptPos.Z)
+
+        root.CFrame = CFrame.lookAt(standPos, lookTarget)
+        print("📍 Positioniert ~1m vor dem Prompt, Blick zum Prompt")
     end
 
     print("⏳ Warte 2 Sekunden vor Prompt...")
