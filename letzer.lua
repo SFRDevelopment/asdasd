@@ -121,7 +121,7 @@ local function mainLoop()
     triggerPrompt(part)
 
     print("⏳ Warte 1 Sekunde vor Serverwechsel...")
-    wait(1)
+    wait(2)
     print("🔄 Wechsle Server...")
     hopToAnotherServer()
 end
