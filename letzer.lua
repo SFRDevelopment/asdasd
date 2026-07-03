@@ -126,6 +126,6 @@ local function mainLoop()
     hopToAnotherServer()
 end
 
-print("⏳ Warte 15 Sekunden vor dem ersten Durchlauf...")
-wait(15)
+print("⏳ Warte 25 Sekunden vor dem ersten Durchlauf...")
+wait(25)
 mainLoop()
